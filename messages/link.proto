@@ -1,0 +1,3 @@
+message Link {
+    string url = 1;
+}

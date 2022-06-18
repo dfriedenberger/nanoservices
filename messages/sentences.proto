@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+enum WORD_TYPE {
+    NOUN = 0;
+    VERB = 1;
+    ADJECTIV = 2;
+    ADVERB = 3;
+    OTHER = 4;
+} 
+
+message Word {
+    string text = 1;
+    WORD_TYPE type = 2;
+}
+
+message Sentence {
+    string text = 1;
+    repeated Word words = 2;
+}
+ 
+message Dictionary {
+    repeated Sentence sentences = 1;
+}
