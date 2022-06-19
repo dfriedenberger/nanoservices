@@ -1,4 +1,6 @@
 *
 !.gitignore
 !nano
+!nano/*
 !c4
+!c4/*
