@@ -72,15 +72,13 @@ for process in wrapper.get_instances(MBA.Process):
     generator.add_function(function,input,output)
     template.create_function(function,input,output)
 
-    # generate tests
+    # generate tests 
     template.create_unittest(function,input,output)
 
+# generate integration test / simulation / ...
 
 
-# generate main
 
-# find root
-# in graph
 
 template.create_file(generator.lines(),"main.py")
 

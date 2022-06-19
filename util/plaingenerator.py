@@ -29,7 +29,7 @@ class PythonPlainGenerator:
 
     def __init__(self,modul):
         self.modul = modul
-        self.imports = ['from pubsub import pub']
+        self.imports = []
         self.dependencies = Dependencies()
 
     def add_class(self,variable):
