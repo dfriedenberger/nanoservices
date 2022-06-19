@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message WordsWeighted {
+    map<string, uint32> words = 1; //frequency (0 often, 9 less) for each word
+}

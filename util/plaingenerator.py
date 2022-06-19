@@ -27,20 +27,19 @@ class Dependencies:
 
 class PythonPlainGenerator:
 
-    def __init__(self,modul):
-        self.modul = modul
+    def __init__(self):
         self.imports = []
         self.dependencies = Dependencies()
 
     def add_class(self,variable):
-        import_str = f"from {self.modul}.{variable.type.lower()} import {variable.type}"
+        import_str = f"from .{variable.path} import {variable.type}"
         if import_str not in self.imports:
             self.imports.append(import_str)
 
 
     def add_function(self,function,input,output):
         
-        import_str = f"from {self.modul}.{function.name} import {function.name}"
+        import_str = f"from .{function.name} import {function.name}"
         if import_str not in self.imports:
             self.imports.append(import_str)
         

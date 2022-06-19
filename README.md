@@ -8,11 +8,13 @@ gen software system from nanofunction definition
 ```
 pip install rdflib
 pip install pypubsub
+pip install pytest
 ```
 
 ### Protobuf
 ```
 apt-get install protobuf-compiler
+pip install protobuf==3.19.0
 ```
 
 ### Plantuml
@@ -52,12 +54,13 @@ java -Dplantuml.include.path="." -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.1.202
 
 
 ## Generate System
-### crete messages
-Protobuf
 
+### Create messages
 ```
-protoc --python_out=python *.proto
+cd messages
+protoc --python_out=../impl *.proto
 ```
+
 ### Monolith
 
 ```

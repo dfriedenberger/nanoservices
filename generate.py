@@ -15,9 +15,17 @@ from util.plaingenerator import PythonPlainGenerator
 def get_name(name):
     return name.lower().replace(" ","_")
 
-def get_type(name):
-    return name.split("/")[-1].split(".")[0].capitalize()
+def get_path(name):
+    return name.split("/")[-1].split(".")[0]
 
+def get_type(name):
+    path = get_path(name)
+    type = ""
+    for part in path.split("_"):
+        type += part.capitalize()
+    return type
+
+ 
 
 # main
 parser = argparse.ArgumentParser(description='Create Network from rdf model.')
@@ -38,9 +46,9 @@ template = PythonTemplateGenerator(args.output_folder)
  
  
 if args.architecture == "pubsub-monolith-python":
-    generator = PythonPubSubGenerator(modul = args.output_folder)
+    generator = PythonPubSubGenerator()
 elif args.architecture == "plain-monolith-python":
-    generator = PythonPlainGenerator(modul = args.output_folder)
+    generator = PythonPlainGenerator()
 else:
     raise ValueError(f"Architecture {args.architecture} is not supported.")
 
@@ -51,7 +59,7 @@ else:
 variables = dict()
 for message in wrapper.get_instances(MBA.Message):
     proto = wrapper.get_single_object_property(message,MBA.datatype)
-    variables[message] = Variable(get_name(wrapper.get_single_object_property(message,MBA.name)),get_type(proto))
+    variables[message] = Variable(get_name(wrapper.get_single_object_property(message,MBA.name)),get_path(proto),get_type(proto))
     generator.add_class(variables[message])
     template.create_class(variables[message])
 

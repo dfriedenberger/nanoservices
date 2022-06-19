@@ -18,6 +18,6 @@ message Sentence {
     repeated Word words = 2;
 }
  
-message Dictionary {
+message Sentences {
     repeated Sentence sentences = 1;
 }

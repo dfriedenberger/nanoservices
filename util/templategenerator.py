@@ -7,17 +7,20 @@ class PythonTemplateGenerator:
         self.path = path
 
     def create_class(self,variable : Variable):
-        filename = f"{self.path}/{variable.type.lower()}.py"
+        filename = f"{self.path}/{variable.path}.py"
         with open(filename,"w") as f:
-            f.write(f"class {variable.type}:\n")
-            f.write("    pass\n")
+
+            #we are using protobuf
+            #f.write(f"class {variable.type}:\n")
+            #f.write("    pass\n")
+            f.write(f"from .{variable.path}_pb2 import {variable.type}\n")
 
     def create_function(self,function : Function, input : Variable, output : Variable):
         filename = f"{self.path}/{function.name}.py"
         with open(filename,"w") as f:
             if input:
-                f.write(f"from .{input.type.lower()} import {input.type}\n")
-            f.write(f"from .{output.type.lower()} import {output.type}\n")
+                f.write(f"from .{input.path} import {input.type}\n")
+            f.write(f"from .{output.path} import {output.type}\n")
             if input:
                 f.write(f"def {function.name}({input.name} : {input.type}) ->  {output.type}:\n")
             else:
@@ -31,8 +34,8 @@ class PythonTemplateGenerator:
 
             f.write(f"def test():\n")
             if input:
-                f.write(f"    from .{input.type.lower()} import {input.type}\n")
-            f.write(f"    from .{output.type.lower()} import {output.type}\n")
+                f.write(f"    from .{input.path} import {input.type}\n")
+            f.write(f"    from .{output.path} import {output.type}\n")
             f.write(f"    from .{function.name} import {function.name}\n")
 
             if input:
