@@ -19,16 +19,21 @@ pip install protobuf==3.19.0
 
 ### Plantuml
 ```
-apt-get install openjdk-11-jdk
+apt-get install openjdk-17-jdk
 apt-get install graphviz
 ```
+
 Download jar from https://plantuml.com/de/download
+```
+cd puml
+wget https://github.com/plantuml/plantuml/releases/download/v1.2022.6/plantuml-1.2022.6.jar
+```
 
 ### Extend Nano puml
 
 https://materialdesignicons.com/
 ```
-java -jar ../plantuml.1.2020.15.jar -encodesprite 16z foo.png
+java -jar ../plantuml-1.2022.6.jar -encodesprite 16z foo.png
 ```
 
 ## Generate rdf Models 
@@ -49,7 +54,7 @@ python create_network_diagram.py puml/youtubetranslator.ttl
 ### Convert puml to png
 ```
 cd puml
-java -Dplantuml.include.path="." -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml.1.2020.15.jar *.puml
+java -Dplantuml.include.path="." -DPLANTUML_LIMIT_SIZE=16384 -jar plantuml-1.2022.6.jar *.puml
 ```
 
 
