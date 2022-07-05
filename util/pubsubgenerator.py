@@ -1,7 +1,6 @@
 from .generator import Variable, Function
 
 
-
 class PythonPubSubGenerator:
 
     def __init__(self):
