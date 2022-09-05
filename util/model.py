@@ -1,58 +1,62 @@
-from .namespace import MBA
-from rdflib import Literal, RDF, URIRef , Seq, BNode
-from rdflib.namespace import  XSD 
+from __future__ import annotations
 
 
-def get_type(t):
-    return t.split('#')[-1]
 
-def get_id(name):
-    return name.lower().replace(" ","_")
+class Message:
 
-class Entity:
-
-    def __init__(self,type,name):
-        self.type = type
+    def __init__(self,name : str):
         self.name = name
-        self.id = get_id(name)
-        self.root =  get_type(type) +"/" + self.id
-        self.rdf_object  = URIRef(MBA.URL+"#" + self.root)
-        self.input = None
-        self.output = None
-
-    def set_input(self,message):
-        self.input = message
     
-    def set_output(self,message):
-        self.output = message
+class Interface:
+    
+    def __init__(self,name : str,input : Message,output : Message):
+        self.name = name
+        self.input = input
+        self.output = output
 
-    def add_to(self,graph):
-        graph.add((self.rdf_object, RDF.type, self.type))
-        graph.add((self.rdf_object, MBA.name, Literal(self.name, datatype=XSD.string)))
-        if self.input:
-            graph.add((self.input.get_rdf(), MBA.input,self.rdf_object))
-        if self.output:
-            graph.add((self.rdf_object, MBA.output,self.output.get_rdf()))
 
-    def get_rdf(self):
-        return self.rdf_object
+class Service:
 
-class Process(Entity):
-    def __init__(self,name):
-        Entity.__init__(self,MBA.Process,name)
+    def __init__(self,name : str):
+        self.name = name
+        self.patterns = list()
+        self.interfaces = list()
+        self.uses = list()
+        self.triggers = list()
 
-class Message(Entity):
+    def set_pattern(self,pattern : str) -> Service:
+        self.patterns.append(pattern)
+        return self
 
-    def __init__(self,name):
-        Entity.__init__(self,MBA.Message,name)
-        self.datatype = None
 
-    def set_datatype(self,datatype):
-        self.datatype = datatype #TODO read protobuf file and convert to Datatype
+    def add_interface(self,interface : Interface):
+        self.interfaces.append(interface)
 
-    def add_to(self,graph):
-        Entity.add_to(self,graph)
-        graph.add((self.rdf_object, MBA.datatype, Literal(self.datatype, datatype=XSD.string)))
+    def add_use(self,service : Service):
+        self.uses.append(service)
 
+    def add_trigger(self,service : Service):
+        self.triggers.append(service)
+
+class Model:
+
+    def __init__(self):
+        self.services = list[Service]()
+        self.messages = list[Message]()
+
+class ModelFactory:
+
+    def __init__(self,model: Model):
+        self.model = model
+
+    def create_service(self,name : str):
+        service = Service(name)
+        self.model.services.append(service)
+        return service
+
+    def create_message(self,name : str):
+        message = Message(name)
+        self.model.messages.append(message)
+        return message
 
 

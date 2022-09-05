@@ -3,7 +3,7 @@ from rdflib.namespace import  XSD
 
 
 from util.namespace import MBA
-from util.model import Process, Message
+from util.model_deprecated import Process, Message
 
 # Create the graph
 graph = Graph()

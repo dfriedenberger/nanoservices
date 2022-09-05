@@ -20,7 +20,15 @@ xTG55iCm30DGbTc-_sttA7fpU8pQoZ-9YtXz_catBMPjGQur4JROj2ghyrgPSzzBJihWUs1EymK8FRez
 xmNWULaV7W_RqyV7PtsX3yzlSqjbefxzSfo2PzqyZwYtMNYU9S_p7aJhFFDh_k-l_HwsKiEbWKkpLlJUuFNvvmG
 }
 
+sprite $wrench [48x48/16z] {
+xT9L4WCn609WrkFS_xJrhZEJklBC5_tnl3J6X-1CZQnKF2UP8WSOzabj3kWun5uAt8L7OdVf3YL4wlKTl7p8PWNe3Im543U89DkrVi1go1xCVattUs0uYkpt
+fpNCwVV0CACVUZ2hHpK48bRzbqW3TQ3rn49jS26mbm9_8IZ2muzKXmi1AdCWmJH909NoDy4VU5m64Yu3BIu27N0147K1H5q0KPSWf0xFoHO
+}
+
 !define Message(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, email, Message)
 
 !define Process(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, cog, Process)
+!define Service(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, wrench, Service)
+
+!define Interface(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, cog, Interface)
 

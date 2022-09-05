@@ -32,6 +32,8 @@ wget https://github.com/plantuml/plantuml/releases/download/v1.2022.6/plantuml-1
 ### Extend Nano puml
 
 https://materialdesignicons.com/
+
+Open and save with Paint (convert transparent to white)
 ```
 java -jar ../plantuml-1.2022.6.jar -encodesprite 16z foo.png
 ```

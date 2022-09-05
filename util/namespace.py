@@ -13,13 +13,14 @@ class MBA(DefinedNamespace):
     # http://www.w3.org/2000/01/rdf-schema#Class
 
     #IPO model
-    Process: URIRef
+    Service: URIRef
+    Interface: URIRef
     Message: URIRef
 
 
     # http://www.w3.org/1999/02/22-rdf-syntax-ns#Property
     name: URIRef #All Objects have names
-    datatype: URIRef #Message has Datatype
+    pattern: URIRef #Service has Pattern
 
     
     # relations
@@ -27,3 +28,5 @@ class MBA(DefinedNamespace):
     input: URIRef
     data: URIRef
     use: URIRef
+    has: URIRef
+    trigger: URIRef
