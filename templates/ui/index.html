@@ -1,0 +1,119 @@
+
+<html>
+
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    </head>
+
+    <body>
+
+
+
+        <script id="form-template" type="text/x-handlebars-template">
+            <h1>{{id}}</h1>
+
+            <form id="{{id}}" action="{{action}}">
+                {{{form}}}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </script>
+
+        <script id="input-template" type="text/x-handlebars-template">
+            <div class="form-group">
+                <label for="{{id}}">{{label}}</label>
+                <input name="{{name}}" type="{{type}}" class="form-control" id="{{id}}">
+            </div>
+        </script>
+
+
+        <div id="container">
+
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js" integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      
+
+        <script>
+            $( document ).ready(function() {
+
+                function convertFormToJSON(form) {
+                    return $(form)
+                        .serializeArray()
+                        .reduce(function (json, { name, value }) {
+                        json[name] = value;
+                        return json;
+                        }, {});
+                }
+
+                var formTemplateSource = document.getElementById("form-template").innerHTML;
+                var formTemplate = Handlebars.compile(formTemplateSource);
+
+                var inputTemplateSource = document.getElementById("input-template").innerHTML;
+                var inputTemplate = Handlebars.compile(inputTemplateSource);
+
+
+                function add_form(config) {
+
+                    var inputs_html = ""
+
+                    for(var i = 0;i < config.inputs.length;i++)
+                    {
+                        name = config.inputs[i] 
+                        inputs_html += inputTemplate({
+                            "name" : name,
+                            "id" : name,
+                            "label" : name,
+                            "type" : "text"
+                        })
+                    }
+
+
+                    var html = formTemplate({
+                        "id" : config.id,
+                        "action" : config.action,
+                        "form" : inputs_html
+                    });
+
+                    html_obj = $(html).on("submit", function (e) {
+                        e.preventDefault();
+                        const form = $(e.target);
+                        const json = convertFormToJSON(form);
+                        const url = $(form).attr('action')
+
+                        console.log(url,json)
+
+                        $.ajax(url, {
+                            type : 'POST',
+                            data : JSON.stringify(json),
+                            contentType : 'application/json',
+                            success: function(data) {  
+                                console.log("success",data)
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                console.log("error",textStatus,errorThrown)
+                            }      
+                        });
+                    });
+
+                    $("#container").append(html_obj);
+                }
+
+            
+
+                /* 
+                    add_form({
+                        "id" : "add-youtube-url",
+                        "action" : "http://localhost:8881/api/add_youtube_url",
+                        "inputs" : ["url"]
+                    });
+                */
+               /*implementation*/
+
+            });
+
+
+        </script>
+    </body>
+</html>

@@ -68,7 +68,7 @@ class SparQLWrapper:
             """).substitute(PROP=prop)
 
         n = [r['value'] for r in self.graph.query(q,initBindings = {'s' : obj })]
-        return map(lambda x : x.value, n)
+        return list(map(lambda x : x.value, n))
         
 
     def get_single_object_property(self,obj,prop):
@@ -81,7 +81,7 @@ class SparQLWrapper:
             """).substitute(PROP=prop)
 
         n = [r['value'] for r in self.graph.query(q,initBindings = {'s' : obj })]
-        if(len(n) != 1): raise ValueError("Not a single result "+str(n))
+        if(len(n) != 1): raise ValueError(f"Not a single result {str(n)} for {obj}")
         return n[0].value
 
     

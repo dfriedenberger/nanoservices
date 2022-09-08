@@ -31,4 +31,5 @@ fpNCwVV0CACVUZ2hHpK48bRzbqW3TQ3rn49jS26mbm9_8IZ2muzKXmi1AdCWmJH909NoDy4VU5m64Yu3
 !define Service(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, wrench, Service)
 
 !define Interface(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, cog, Interface)
+!define Property(e_alias, e_label, e_techn) Entity(e_alias, e_label, e_techn, #D86613, cog, Property)
 

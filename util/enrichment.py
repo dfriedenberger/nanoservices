@@ -25,9 +25,7 @@ def enrichment(graph : Graph) -> None:
 
     
     for service in query_wrapper.get_instances_of_type(MBA.Service):
-        name = query_wrapper.get_single_object_property(service,MBA.name)
         for pattern in query_wrapper.get_object_properties(service,MBA.pattern):
-            print(name,"has",pattern)
             if pattern == "repository":
                 repositories.append(service)
             if pattern == "job":
@@ -37,20 +35,32 @@ def enrichment(graph : Graph) -> None:
             triggers_send.append(service)
             triggers_recv.append(triggered_service)
     
-    #needs job-management? -> change of structure
+    # strategy handle job patterns -> change of structure (jobs did not recv triggers)
+    ## Alternative waere aws Batch Jobs
     if len(jobs) > 0:
         # add job-repository
         rdf_job_repository = create_wrapper.add_named_instance(MBA.Service,"job-repository")
+        create_wrapper.add_str_property(MBA.pattern,rdf_job_repository,"repository")
         repositories.append(rdf_job_repository)
+
+        #Add Queue
+        rdf_msg = create_wrapper.add_named_instance(MBA.Message,"job")
+        properties = { "id" : "UUID" ,  "job" : "JSON" , "state" : "STRING"}
+        for k in properties:
+            rdf_prop = create_wrapper.add_named_instance(MBA.Property,k,unique_name="job-"+k)
+            create_wrapper.add_str_property(MBA.datatype,rdf_prop,properties[k])
+            create_wrapper.add_reference(MBA.has,rdf_msg,rdf_prop)
+        create_wrapper.add_reference(MBA.data,rdf_job_repository,rdf_msg)
 
         # add job-controller
         rdf_job_controller = create_wrapper.add_named_instance(MBA.Service,"job-controller")
+        create_wrapper.add_str_property(MBA.pattern,rdf_job_controller,"job-controller")
         create_wrapper.add_reference(MBA.use,rdf_job_controller,rdf_job_repository)
 
         # add job-scheduler's
         rdf_job_scheduler = create_wrapper.add_named_instance(MBA.Service,"job-scheduler")
+        create_wrapper.add_str_property(MBA.pattern,rdf_job_scheduler,"job-scheduler")
         create_wrapper.add_reference(MBA.use,rdf_job_scheduler,rdf_job_repository)
-
 
         for job in jobs:
             # add use
@@ -61,7 +71,15 @@ def enrichment(graph : Graph) -> None:
         triggers_recv.append(rdf_job_controller)
        
 
+        #grouping
+        create_wrapper.add_str_property(MBA.group,rdf_job_repository,'system.job.management')
+        create_wrapper.add_str_property(MBA.group,rdf_job_controller,'system.job.management')
+        create_wrapper.add_str_property(MBA.group,rdf_job_scheduler,'system.job.management')
+        for job in jobs:
+            create_wrapper.add_str_property(MBA.group,job,'system.job')
 
+
+    # strategy handle repository patterns
     if len(repositories) > 0:
         # add database
         rdf_db = create_wrapper.add_named_instance(MBA.Service,"db")
@@ -70,24 +88,25 @@ def enrichment(graph : Graph) -> None:
         for rdf_repository in repositories:
             create_wrapper.add_reference(MBA.use,rdf_repository,rdf_db)
 
+        #grouping
+        create_wrapper.add_str_property(MBA.group,rdf_db,'system.infrastructure')
 
-
-    # needs pub-sub communication
-    ## yes for tracing
+    # strategy handle pub-sub communication
+    ## yes for tracing, Global parameter
     if len(triggers_recv) > 0 or len(triggers_send) > 0:
         rdf_mqtt = create_wrapper.add_named_instance(MBA.Service,"mqtt")
+        create_wrapper.add_str_property(MBA.pattern,rdf_mqtt,"pubsub-broker")
+
         for t in triggers_send:
             create_wrapper.add_reference(MBA.use,t,rdf_mqtt)
         for t in triggers_recv:
-            create_wrapper.add_reference(MBA.use,rdf_mqtt,t)
+            create_wrapper.add_reference(MBA.use,t,rdf_mqtt)
+
+        #Todo create Topics
 
 
-    # Add Config
+        create_wrapper.add_str_property(MBA.group,rdf_mqtt,'system.infrastructure')
 
-    # Add Impl-Task to Services
-    # Libraries, Readme, Dockerfile, 
-    # Add Hardware
-
-    # Add Deployment
+    #VPC or distributed over Internet
 
     

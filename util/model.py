@@ -6,7 +6,15 @@ class Message:
 
     def __init__(self,name : str):
         self.name = name
+        self.properties = dict()
+        self.type = "object" #default
     
+    def set_type(self,type): # list , blob, string, ...
+        self.type = type
+        
+    def add(self,name : str,type : str):
+        self.properties[name] = type
+
 class Interface:
     
     def __init__(self,name : str,input : Message,output : Message):
@@ -23,6 +31,7 @@ class Service:
         self.interfaces = list()
         self.uses = list()
         self.triggers = list()
+        self.data = list()
 
     def set_pattern(self,pattern : str) -> Service:
         self.patterns.append(pattern)
@@ -37,6 +46,9 @@ class Service:
 
     def add_trigger(self,service : Service):
         self.triggers.append(service)
+
+    def add_data(self,message : Message):
+        self.data.append(message);
 
 class Model:
 

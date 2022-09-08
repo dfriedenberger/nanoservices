@@ -8,7 +8,21 @@ from .namespace import MBA
 def add_node(puml,wrapper,instance):
     type = wrapper.get_type(instance).split("#")[1]
     name = wrapper.get_single_object_property(instance,MBA.name)
-    puml.create_node(instance,name,type)
+
+    # Todo Redesign Group
+    group = ["system"] # default
+
+    groups = wrapper.get_object_properties(instance,MBA.group)
+    if len(groups) > 0:
+        group = groups[0].split(".")
+    
+    #Workaround (extern)
+    patterns = wrapper.get_object_properties(instance,MBA.pattern)
+    if "extern" in patterns: group = []
+
+
+
+    puml.create_node(instance,name,type,group)
 
 def rdf2puml(graph : Graph) -> PumlModel:
 

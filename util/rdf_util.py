@@ -17,12 +17,13 @@ class GraphWrapper:
     def __init__(self,graph : Graph):
         self.graph = graph
 
-    def add_named_instance(self,type : URIRef,name : str) -> URIRef:
-        rdf_object  = create_ref(type,name)
+    def add_named_instance(self,type : URIRef,name : str,unique_name : str = None) -> URIRef:
+        if unique_name == None: unique_name = name
+        rdf_object  = create_ref(type,unique_name)
         self.graph.add((rdf_object, RDF.type, type))
         self.graph.add((rdf_object, MBA.name, Literal(name, datatype=XSD.string)))
         return rdf_object
-
+    
     def add_reference(self,type : URIRef,source : URIRef,target : URIRef) -> None:
         self.graph.add((source, type, target))
 
@@ -37,7 +38,11 @@ def create_graph(model: Model) -> Graph:
 
     for message in model.messages:
         #Add Message
-        wrapper.add_named_instance(MBA.Message,message.name)
+        rdf_msg = wrapper.add_named_instance(MBA.Message,message.name)
+        for k in message.properties:
+            rdf_prop = wrapper.add_named_instance(MBA.Property,k,unique_name=message.name+"-"+k)
+            wrapper.add_str_property(MBA.datatype,rdf_prop,message.properties[k])
+            wrapper.add_reference(MBA.has,rdf_msg,rdf_prop)
         
     for service in model.services:
         #Add service
@@ -47,6 +52,10 @@ def create_graph(model: Model) -> Graph:
         for pattern in service.patterns:
             wrapper.add_str_property(MBA.pattern,rdf_object,pattern)
     
+        for datum in service.data:
+            rdf_data = create_ref(MBA.Message,datum.name)
+            wrapper.add_reference(MBA.data,rdf_object,rdf_data)
+
         for interface in service.interfaces:
             rdf_interface  = wrapper.add_named_instance(MBA.Interface,interface.name)
             

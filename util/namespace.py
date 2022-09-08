@@ -16,12 +16,13 @@ class MBA(DefinedNamespace):
     Service: URIRef
     Interface: URIRef
     Message: URIRef
+    Property: URIRef
 
 
     # http://www.w3.org/1999/02/22-rdf-syntax-ns#Property
     name: URIRef #All Objects have names
     pattern: URIRef #Service has Pattern
-
+    group: URIRef #Service contains to Group
     
     # relations
     output: URIRef
@@ -30,3 +31,4 @@ class MBA(DefinedNamespace):
     use: URIRef
     has: URIRef
     trigger: URIRef
+    datatype: URIRef

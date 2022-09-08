@@ -1,3 +1,4 @@
+from sys import implementation
 from util.model import Model, ModelFactory , Interface
 from util.rdf_util import create_graph
 from util.rdf2puml import rdf2puml, rdf2pumlByRelation
@@ -5,6 +6,8 @@ from util.rdf2puml import rdf2puml, rdf2pumlByRelation
 from util.namespace import MBA
 
 from util.enrichment import enrichment
+from util.implementation import implementation
+
 
 # TODO: generate from graphml-File or comparable Tool
 
@@ -13,7 +16,23 @@ modelFactory = ModelFactory(model)
 
 
 # Databases 
-repository = modelFactory.create_service("subtitle-repository").set_pattern('repository')
+repository = modelFactory.create_service("media-repository").set_pattern('repository')
+
+media = modelFactory.create_message("media")
+media.add("id","UUID")
+media.add("title","STRING")
+media.add("config","JSON")
+
+subtitle = modelFactory.create_message("subtitle")
+subtitle.add("id","UUID")
+subtitle.add("media_id","UUID")
+subtitle.add("language","STRING")
+subtitle.add("format","STRING")
+subtitle.add("data","TEXT")
+
+repository.add_data(media)
+repository.add_data(subtitle)
+
 
 
 # External Services
@@ -26,7 +45,7 @@ deepl_service = modelFactory.create_service("deepl.com").set_pattern('extern')
 
 ## text.frittenburger.de
 
-text_service = modelFactory.create_service("text-service")
+text_service = modelFactory.create_service("text-service").set_pattern('intern')
 
 text_service_input = modelFactory.create_message("text-service-input")
 text_service_output = modelFactory.create_message("text-service-output")
@@ -36,19 +55,38 @@ text_service.add_interface(Interface("text-service-interface",input = text_servi
 ## api
 
 
+# vocabulary from Youtube Video, opensubtitles.org , Songtext
 
-api_service = modelFactory.create_service("ui-api")
+api_service = modelFactory.create_service("ui-api").set_pattern('api')
 
-movie_search_request = modelFactory.create_message("movie-search-request")
-movie_search_response = modelFactory.create_message("movie-search-response")
-api_service.add_interface(Interface("search",input = movie_search_request,output = movie_search_response))
+media_id_response = modelFactory.create_message("media-id-response")
+media_id_response.add("media_id","UUID")
+
+youtube_url_request = modelFactory.create_message("youtube-url")
+youtube_url_request.add("url","STRING")
+
+api_service.add_interface(Interface("add_youtube_url",input = youtube_url_request,output = media_id_response))
+
+opensubtitles_id_request = modelFactory.create_message("opensubtitles-id")
+opensubtitles_id_request.add("id","INT")
+
+api_service.add_interface(Interface("add_opensubtitles_id",input = opensubtitles_id_request,output = media_id_response))
+
 
 vocabulary_list_request = modelFactory.create_message("vocabulary-list-request")
+vocabulary_list_request.add("id","INT")
+
 vocabulary_list_response = modelFactory.create_message("vocabulary-list-response")
+vocabulary_list_response.add("id","INT")
+
 api_service.add_interface(Interface("list",input = vocabulary_list_request,output = vocabulary_list_response))
 
 vocabulary_request = modelFactory.create_message("vocabulary-request")
+vocabulary_request.add("id","UUID")
+
 vocabulary_response = modelFactory.create_message("vocabulary-response")
+vocabulary_response.add("id","UUID")
+
 api_service.add_interface(Interface("export",input = vocabulary_request,output = vocabulary_response))
 
 api_service.add_use(repository)
@@ -100,9 +138,19 @@ graph.serialize(destination="puml/vokabellernen.ttl",format='turtle')
 
 
 
+## TODO: Fragebogen/Config Architektur Entscheidungen
+## Save as Architecture Decision Records 
+## VPC vs Internet
+## Synchronous and asynchronous point-to-point communication
+## Anonymous publish/subscribe
+
 ## enrichment (impl, deployments)
 enrichment(graph)
+graph.serialize(destination="puml/vokabellernen_enriched.ttl",format='turtle')
 
+
+
+implementation(graph,"vokabelnlernen_impl")
 
 
 ## Die Templates 'impl' generieren
