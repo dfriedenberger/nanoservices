@@ -22,8 +22,8 @@ class NoImplementation:
 class ApisImplementation:
     
     template_api = """
-@app.post("/api/{name}")
-async def {name}(request: Request):
+@app.post("/api/{path}")
+async def {func_name}(request: Request):
     req = await request.json()
     print(req)
     return {output}
@@ -31,8 +31,8 @@ async def {name}(request: Request):
     def __init__(self):
         self.implementation = ""
    
-    def add_api(self,interface_name,input_messages,output_messages):
-        self.implementation += self.template_api.format(name=interface_name,input=", ".join(input_messages),output=", ".join(output_messages))
+    def add_api(self,interface_name,function_name,input_messages,output_messages):
+        self.implementation += self.template_api.format(path=interface_name,func_name=function_name,input=", ".join(input_messages),output=", ".join(output_messages))
     
     def code(self):
         return self.implementation
@@ -242,6 +242,8 @@ def create_python_app(service,project,project_name,template_path,program_name,im
             ## Create Library
             pojo_py = Template("templates/api/pojo.py")
             pojo_py.replace("#{pojo}",pojoImplementation.code())
+
+            project.create_subdirectory(f"{project_name}/src")
             project.create_file(f"{project_name}/src/{lower_camel_case(input_msg_name)}.py",pojo_py)
             imports.append(f"from src.{lower_camel_case(input_msg_name)} import {upper_camel_case(input_msg_name)}")
 
@@ -261,7 +263,7 @@ def create_python_app(service,project,project_name,template_path,program_name,im
             project.create_file(f"{project_name}/src/{lower_camel_case(output_msg_name)}.py",pojo_py)
             imports.append(f"from src.{lower_camel_case(output_msg_name)} import {upper_camel_case(output_msg_name)}")
 
-        implementation.add_api(interface_name,input_messages,output_messages)
+        implementation.add_api(interface_name,lower_camel_case(interface_name),input_messages,output_messages)
 
     #Implementation  python script
     program = Template(f"templates/{template_path}/{program_name}")
@@ -506,12 +508,12 @@ def create_service(project: Project, service ,query_wrapper):
 
 
 
-def implementation(graph : Graph,path : str):
+def implementation(graph : Graph,path : str, key : str):
     
     query_wrapper = SparQLWrapper(graph)
 
 
-    project = Project(path,"frittenburger")
+    project = Project(path,key)
     # Create Config
         
     # Add Implementations or ImplementationTask  to Services

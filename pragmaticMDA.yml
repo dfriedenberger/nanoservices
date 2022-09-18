@@ -1,0 +1,49 @@
+messages:
+
+  model:
+    id : UUID
+    format : STRING
+    model : TEXT
+
+  text-model-id:
+    model_id  : UUID
+
+  text-model:
+    model_id  : UUID
+    model     : TEXT
+
+  text-model-url:
+    url       : TEXT
+
+  update-status:
+    id      : UUID
+    status  : STRING
+
+services:
+
+  # repository for data
+  model-repository:
+    pattern: repository
+    data: [model]
+
+  # Internal Service
+  plantuml-service:
+    pattern : intern
+
+  ui-api:
+    pattern : api
+    interfaces:
+      update-model:
+        input  : text-model
+        output : update-status
+      read-model:
+        input  : text-model-id
+        output : text-model
+      read-puml-model:
+        input  : text-model-id
+        output : text-model-url
+    uses: [model-repository, plantuml-service]
+
+  user-interface:
+    pattern: ui
+    use: [ui-api]

@@ -87,8 +87,8 @@ services:
     triggers: [download]
 
   user-interface:
-    patter: ui
-    use: [ui-api]
+    pattern: ui
+    uses: [ui-api]
 
   # Jobs
   download:
