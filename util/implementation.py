@@ -161,7 +161,9 @@ class Project:
                 with open(path+".merge","w",encoding="UTF-8") as f:
                     f.write(template.data)
                     print("path",path+".merge","created")
-                raise ValueError(f"there are changes in {subpath}, merge manually")
+                print(f"there are changes in {subpath}, merge manually")
+                return   
+                #raise ValueError(f"there are changes in {subpath}, merge manually")
         with open(path,"w",encoding="UTF-8") as f:
             f.write(template.data)
             print("path",path,"created")
@@ -458,12 +460,15 @@ def create_service(project: Project, service ,query_wrapper):
         config = Template("templates/database/database.yml")
         config.replace("{PASSWORD}",password)
         project.create_file(f"{project_name}/database.yml",config)
-        
+        #env file
+        env_file = Template("templates/database/credentials.env")
+        env_file.replace("{PASSWORD}",password)
+        project.create_file(f"{project_name}/credentials.env",env_file)
+
         ## Docker compose file
         docker_compose = Template("templates/database/docker-compose.yml")
         docker_compose.replace("{CONTAINER_NAME}",f"{project.prefix}-{project_name}")
         docker_compose.replace("{MYSQL_VOLUME}",f"{project.prefix}-{project_name}-data")
-        docker_compose.replace("{PASSWORD}",password)
 
         project.create_file(f"{project_name}/docker-compose.yml",docker_compose)
 

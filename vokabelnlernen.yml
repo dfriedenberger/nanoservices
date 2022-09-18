@@ -1,0 +1,108 @@
+
+
+messages:
+  media:
+    id     : UUID
+    title  : STRING
+    config : JSON
+
+
+  subtitle:
+    id        : UUID
+    media_id  : UUID
+    language  : STRING
+    format    : STRING
+    data      : TEXT
+
+  text_service_input:
+
+  text_service_output:
+
+  youtube-url:
+    url: string
+
+  opensubtitles-id:
+    id: INT
+
+  media-id-response:
+    media_id  : UUID
+
+  vocabulary-list-request:
+    id: INT
+
+  vocabulary-list-response:
+    id: INT
+
+  vocabulary-request:
+    id  : UUID
+
+  vocabulary-response:
+    id  : UUID
+
+services:
+
+  # repository for data
+  media-repository:
+    pattern: repository
+    data: [media, subtitle]
+
+
+  # External services
+  youtube.com:
+    pattern: extern
+
+  opensubtitle.org:
+    pattern: extern
+
+  deepl.com:
+    pattern: extern
+
+  # Internal Service
+  text-service:
+    pattern : intern
+    interfaces:
+      text-service-interface:
+        input  : text_service_input
+        output : text_service_output
+
+  # UI
+  # vocabulary from Youtube Video, opensubtitles.org , Songtext
+
+  "ui-api":
+    pattern : api
+    interfaces:
+      add_youtube_url:
+        input  : youtube-url
+        output : media-id-response
+      add_opensubtitles_id:
+        input  : opensubtitles-id
+        output : media-id-response
+      list:
+        input  : vocabulary-list-request
+        output : vocabulary-list-response
+      export:
+        input  : vocabulary-request
+        output : vocabulary-response
+    uses: [media-repository]
+    triggers: [download]
+
+  user-interface:
+    patter: ui
+    use: [ui-api]
+
+  # Jobs
+  download:
+    pattern : job
+    uses: [youtube.com , opensubtitle.org , media-repository]
+    triggers: [parsing]
+
+  ### Parsing/Annotating Subtitle
+  parsing:
+    pattern : job
+    uses: [youtube.com , text-service, media-repository]
+    triggers: [translate]
+
+  ### Translate Vocabulary
+  translate:
+    pattern : job
+    uses: [deepl.com , media-repository]

@@ -3,14 +3,14 @@ version: '2'
 services:
 
   db:
+    env_file:
+      - credentials.env
     hostname: db
     container_name: {CONTAINER_NAME}
     image: mysql
     restart: always
     ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: {PASSWORD}
+      - "3306:3306"      
     volumes:
       - {MYSQL_VOLUME}:/var/lib/mysql
   

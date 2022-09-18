@@ -96,4 +96,5 @@ python -m impl.main
 pytest impl/
 ```
 
-
+### Sicherheit nicht selbst implementieren
+sops (https://github.com/mozilla/sops) , keycloak, vault (https://www.vaultproject.io/) , credstash (https://github.com/fugue/credstash)
