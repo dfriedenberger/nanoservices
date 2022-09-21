@@ -1,0 +1,159 @@
+
+<html>
+
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <style type="text/css" media="screen">
+            #editor { 
+                position: relative;
+                width: 100%;
+                height: 600px;
+            }
+        </style>
+    </head>
+
+    <body>
+
+
+
+
+
+        <div id="container">
+
+            <div class="row">
+                <div class="col-sm">
+
+                    <div id="editor"></div>
+
+                </div>
+                <div class="col-sm">
+                    <img id="model-image" style="max-height:600px; height: auto;width:auto;" src="">
+                </div>
+              </div>
+            
+
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js" integrity="sha512-RNLkV3d+aLtfcpEyFG8jRbnWHxUqVZozacROI4J2F1sTaDqo1dPQYs01OMi1t1w9Y2FdbSCDSQ2ZVdAC8bzgAg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/ace.min.js"></script>
+
+        <script>
+            $( document ).ready(function() {
+
+
+                var uuidv4 = function uuidv4() {
+                    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+                    );
+                }
+
+                
+
+                var getUrlParameter = function getUrlParameter(sParam) {
+                    var sPageURL = window.location.search.substring(1),
+                        sURLVariables = sPageURL.split('&'),
+                        sParameterName,
+                        i;
+
+                    for (i = 0; i < sURLVariables.length; i++) {
+                        sParameterName = sURLVariables[i].split('=');
+
+                        if (sParameterName[0] === sParam) {
+                            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                        }
+                    }
+                    return false;
+                };
+
+                var modelid = getUrlParameter('model-id');
+                console.log("modelid",modelid)
+                if (!modelid) {
+                    window.location.replace(window.location.href+"?model-id="+uuidv4());
+                }
+                
+                
+                /* Editor */
+                ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/')
+                var editor = ace.edit("editor");
+                editor.setTheme("ace/theme/terminal");
+                editor.session.setMode("ace/mode/yaml");
+                editor.session.setTabSize(2);
+       
+               
+
+
+                $.ajax("http://localhost:8881/api/read-model", {
+                            type : 'POST',
+                            data : JSON.stringify({"model_id": modelid}),
+                            contentType : 'application/json',
+                            success: function(data) {  
+                                if (data.hasOwnProperty('model')) {
+                                    editor.setValue(data.model)
+                                }
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                console.log("error",textStatus,errorThrown)
+                            }      
+                });
+
+                var updateImage = function updateImage() {
+                    $.ajax("http://localhost:8881/api/read-puml-model", {
+                                type : 'POST',
+                                data : JSON.stringify({"model_id": modelid}),
+                                contentType : 'application/json',
+                                success: function(data) {  
+                                    if (data.hasOwnProperty('url')) {
+                                        $("#model-image").attr('src',data.url)
+                                    }
+                                },
+                                error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                    console.log("error",textStatus,errorThrown)
+                                }      
+                    });
+                }   
+                updateImage();
+
+                var typingTimer;                //timer identifier
+
+                editor.session.on('change', function(delta) {
+                    // delta.start, delta.end, delta.lines, delta.action
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(doneTyping, 2000);
+                });
+                
+            
+                function doneTyping () {
+
+                    
+                        const url = "http://localhost:8881/api/update-model"
+                        json = {
+                            "model_id" : modelid,
+                            "model" : editor.getValue()
+                        }
+                        console.log(url,json)
+
+                        $.ajax(url, {
+                            type : 'POST',
+                            data : JSON.stringify(json),
+                            contentType : 'application/json',
+                            success: function(data) {  
+                                console.log("success",data)
+                                updateImage();
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                                console.log("error",textStatus,errorThrown)
+                            }      
+                        });
+                }
+
+            
+            });
+
+
+        </script>
+    </body>
+</html>
