@@ -16,7 +16,26 @@
 
     <body>
 
-
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+              <span class="fs-4">Pragmatic Model Driven Architecture</span>
+            </a>
+      
+            <ul class="nav nav-pills">
+              <li class="nav-item"><a href="#" class="nav-link">Docs</a></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Examples
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#">Simple WebServer</a></li>
+                  <li><a class="dropdown-item" href="#">PragmaticMDA</a></li>
+                  <li><a class="dropdown-item" href="#">Vocabulary Creator</a></li>
+                </ul>
+              </li>
+              <li class="nav-item"><a href="#" class="nav-link">Contact</a></li>
+            </ul>
+          </header>
 
 
 
@@ -31,6 +50,20 @@
                 <div class="col-sm">
                     <img id="model-image" style="max-height:600px; height: auto;width:auto;" src="">
                 </div>
+
+                <div class="col-sm">
+                    <div id="status" class="alert alert-primary" role="alert">
+                        Welcome!
+                    </div>
+
+                    <form>
+                        <select id="model_type" class="form-select" aria-label="Default select example">
+                            <option value="cim" selected>Computation IndependentModel (CIM)</option>
+                            <option value="pim">Platform Independent Model (PIM)</option>
+                            <option value="psm">Platform Specific Model (PSM) - docker</option>
+                        </select>
+                    </form>
+                <div>
               </div>
             
 
@@ -74,7 +107,41 @@
                 if (!modelid) {
                     window.location.replace(window.location.href+"?model-id="+uuidv4());
                 }
-                
+
+                var ok_status = function ok_status(msg) {
+                    $('#status').text(msg);
+                    $("#status").addClass("alert-success");
+                    $("#status").removeClass("alert-primary alert-danger"); 
+                }
+
+                var error_status = function error_status(msg) {
+                    console.log("ERROR",msg)
+                    $('#status').text(msg);
+                    $("#status").addClass("alert-danger");
+                    $("#status").removeClass("alert-primary alert-success"); 
+                }
+
+                var error_handler = function error_handler(jqXHR,exception) {
+                        console.log(jqXHR,exception)
+                        var msg = '';
+                        if (jqXHR.status === 0) {
+                            msg = 'No connection.\n Verify Network.';
+                            //ERR_CONNECTION_REFUSED hits this one
+                        } else if (jqXHR.status == 404) {
+                            msg = 'Requested page not found. [404]';
+                        } else if (jqXHR.status == 500) {
+                            msg = 'Internal Server Error [500].';
+                        } else if (exception === 'parsererror') {
+                            msg = 'Requested JSON parse failed.';
+                        } else if (exception === 'timeout') {
+                            msg = 'Time out error.';
+                        } else if (exception === 'abort') {
+                            msg = 'Ajax request aborted.';
+                        } else {
+                            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                        }
+                        error_status(msg)
+                }
                 
                 /* Editor */
                 ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/')
@@ -91,31 +158,43 @@
                             data : JSON.stringify({"model_id": modelid}),
                             contentType : 'application/json',
                             success: function(data) {  
-                                if (data.hasOwnProperty('model')) {
-                                    editor.setValue(data.model)
+                                if (!data.hasOwnProperty('model')) {
+                                    console.log("data has no key 'model'",data)
+                                    return;
                                 }
+                                editor.setValue(data.model)
+                                updateImage();
+
                             },
-                            error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                                console.log("error",textStatus,errorThrown)
+                            error: function(jqXHR, textStatus,errorThrown) { 
+                                    error_handler(jqXHR, textStatus)
+                                    //console.log("error",textStatus,errorThrown)
                             }      
                 });
 
                 var updateImage = function updateImage() {
+
+                    model_type = $('#model_type').val()
                     $.ajax("http://localhost:8881/api/read-puml-model", {
                                 type : 'POST',
-                                data : JSON.stringify({"model_id": modelid}),
+                                data : JSON.stringify({"model_id": modelid, "model_type" : model_type}),
                                 contentType : 'application/json',
                                 success: function(data) {  
+
                                     if (data.hasOwnProperty('url')) {
                                         $("#model-image").attr('src',data.url)
+                                        ok_status("Model successful created")
+                                        return
                                     }
+                                    console.log(data)
+                                    error_status(data.error)
                                 },
-                                error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                                    console.log("error",textStatus,errorThrown)
+                                error: function(jqXHR, textStatus, errorThrown) { 
+                                    error_handler(jqXHR, textStatus)
+                                    //console.log("error",textStatus,errorThrown)
                                 }      
                     });
                 }   
-                updateImage();
 
                 var typingTimer;                //timer identifier
 
@@ -126,6 +205,10 @@
                 });
                 
             
+                $('#model_type').on('change', function() {
+                    updateImage();
+                });
+
                 function doneTyping () {
 
                     
@@ -144,8 +227,9 @@
                                 console.log("success",data)
                                 updateImage();
                             },
-                            error: function(XMLHttpRequest, textStatus, errorThrown) { 
-                                console.log("error",textStatus,errorThrown)
+                            error: function(jqXHR, textStatus, errorThrown) { 
+                                error_handler(jqXHR, textStatus)
+                                //console.log("error",textStatus,errorThrown)
                             }      
                         });
                 }

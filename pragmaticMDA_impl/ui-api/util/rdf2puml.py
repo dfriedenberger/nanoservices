@@ -41,13 +41,21 @@ def rdf2puml(graph : Graph) -> PumlModel:
 
 
 
-def rdf2pumlByRelation(graph : Graph,relation_type : URIRef) -> PumlModel:
+def rdf2pumlServices(graph : Graph) -> PumlModel:
 
     puml = PumlModel("Architecture")
     wrapper = SparQLWrapper(graph)
 
 
-    for (n1,n2) in wrapper.get_references_by_type(relation_type):
+    for n in wrapper.get_instances_of_type(MBA.Service):
+        add_node(puml,wrapper,n)
+
+    for (n1,n2) in wrapper.get_references_by_type(MBA.use):
+        add_node(puml,wrapper,n1)
+        add_node(puml,wrapper,n2)
+        puml.create_relation(n1,n2)
+    
+    for (n1,n2) in wrapper.get_references_by_type(MBA.trigger):
         add_node(puml,wrapper,n1)
         add_node(puml,wrapper,n2)
         puml.create_relation(n1,n2)

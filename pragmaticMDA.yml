@@ -12,6 +12,10 @@ messages:
     model_id  : UUID
     model     : TEXT
 
+  text-model-config:
+    model_id   : UUID
+    model_type : STRING
+
   text-model-url:
     url       : TEXT
 
@@ -40,7 +44,7 @@ services:
         input  : text-model-id
         output : text-model
       read-puml-model:
-        input  : text-model-id
+        input  : text-model-config
         output : text-model-url
     uses: [model-repository, plantuml-service]
 
