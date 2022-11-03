@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ACE in Action</title>
+<style type="text/css" media="screen">
+    #editor { 
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+</head>
+<body>
+
+<div id="editor">@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+@prefix : &lt;http://www.frittenburger.de/me&gt; .
+@prefix geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos&gt;
+
+
+.flexidug a foaf:Project .
+
+:dirk.friedenberger a foaf:Person .
+:dirk.friedenberger foaf:name &quot;Dirk Friedenberger&quot;@en .
+:dirk.friedenberger foaf:age &quot;44&quot;^^xsd:int .    
+:dirk.friedenberger foaf:knows andreas.polze .
+:dirk.friedenberger foaf:currentProject flexidug . 
+</div>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/ace.min.js"></script>
+<script>
+    ace.config.set('basePath', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/')
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/terminal");
+    //editor.session.setMode("ace/mode/yaml");
+    editor.session.setMode("ace/mode/turtle");
+</script>
+</body>
+</html>

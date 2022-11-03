@@ -1,0 +1,4 @@
+
+host:  "{{host}}"
+user:  "root"
+password: "{{db-root-password}}"

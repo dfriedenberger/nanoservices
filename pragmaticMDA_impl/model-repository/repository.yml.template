@@ -1,0 +1,5 @@
+
+host:  "{{host}}"
+user:  "model-repository-user"
+password: "{{model-repository-user-password}}"
+database: "model_repository_database"

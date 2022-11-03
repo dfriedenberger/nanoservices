@@ -1,0 +1,5 @@
+uvicorn==0.18.2
+fastapi==0.78.0
+PyYAML==6.0
+mysql-connector-python==8.0.30
+plantuml==0.3.0
