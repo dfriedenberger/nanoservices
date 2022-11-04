@@ -1,0 +1,1 @@
+CREATE TABLE job ( id VARCHAR(36),job JSON,state VARCHAR(100) )

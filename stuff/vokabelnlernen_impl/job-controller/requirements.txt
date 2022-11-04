@@ -1,0 +1,4 @@
+argparse==1.4.0
+PyYAML==6.0
+mysql-connector-python==8.0.30
+paho-mqtt==1.6.1

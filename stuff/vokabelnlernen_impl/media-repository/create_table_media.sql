@@ -1,0 +1,1 @@
+CREATE TABLE media ( id VARCHAR(36),title VARCHAR(100),config JSON )

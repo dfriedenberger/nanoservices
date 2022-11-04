@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  db:
+    env_file:
+      - credentials.env
+    hostname: db
+    container_name: vokabelnlernen-db
+    image: mysql
+    restart: always
+    ports:
+      - "3306:3306"      
+    volumes:
+      - vokabelnlernen-db-data:/var/lib/mysql
+  
+volumes:
+  vokabelnlernen-db-data:
