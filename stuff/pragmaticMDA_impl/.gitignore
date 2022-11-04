@@ -1,5 +1,6 @@
 database.yml
 repository.yml
+credentials.yml
 credentials.env
 *.merge
 *.bak

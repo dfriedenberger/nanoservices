@@ -1,0 +1,5 @@
+services:
+
+  # Content Managemennt System
+  wordpress:
+    pattern: cms
