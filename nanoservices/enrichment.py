@@ -18,6 +18,8 @@ def enrichment(graph : Graph) -> None:
     create_wrapper = GraphWrapper(graph)
 
     repositories = []
+    cmss = []
+
     jobs = []
 
     triggers_send = []
@@ -28,6 +30,8 @@ def enrichment(graph : Graph) -> None:
         for pattern in query_wrapper.get_object_properties(service,MBA.pattern):
             if pattern == "repository":
                 repositories.append(service)
+            if pattern == "cms":
+                cmss.append(service)
             if pattern == "job":
                 jobs.append(service) 
         
@@ -81,13 +85,16 @@ def enrichment(graph : Graph) -> None:
 
 
     # strategy handle repository patterns
-    if len(repositories) > 0:
+    if len(repositories) > 0 or len(cmss) > 0:
         # add database
         rdf_db = create_wrapper.add_named_instance(MBA.Service,"db")
         create_wrapper.add_str_property(MBA.pattern,rdf_db,"database")
 
         for rdf_repository in repositories:
             create_wrapper.add_reference(MBA.use,rdf_repository,rdf_db)
+        
+        for rdf_cms in cmss:
+            create_wrapper.add_reference(MBA.use,rdf_cms,rdf_db)
 
         #grouping
         create_wrapper.add_str_property(MBA.group,rdf_db,'system.infrastructure')
