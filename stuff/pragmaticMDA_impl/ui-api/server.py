@@ -5,9 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 from fastapi.responses import FileResponse
 
-import zlib
 import uvicorn
-import base64
 
 from plantuml import PlantUML
 
@@ -19,10 +17,9 @@ from src.textModel import TextModel
 from src.textModelConfig import TextModelConfig
 from src.textModelUrl import TextModelUrl
 
-from util.yaml2rdf import create_rdf_from_yaml
-from util.rdf2puml import rdf2puml, rdf2pumlServices
-from util.namespace import MBA
-from util.enrichment import enrichment
+from nanoservices.yaml2rdf import create_rdf_graph_from_yaml
+from nanoservices.rdf2puml import rdf2pumlServices
+from nanoservices.enrichment import enrichment
 
 app = FastAPI()
 
@@ -105,9 +102,9 @@ async def readPumlModel(request: Request):
 
         # Recrate model
         try:
-            graph = create_rdf_from_yaml(yaml)
+            graph = create_rdf_graph_from_yaml(yaml)
         except Exception as err:
-            return { "error": f"create_rdf_from_yaml: {err}, {type(err)}"}
+            return { "error": f"create_rdf_graph_from_yaml: {err}, {type(err)}"}
 
         if model_type != 'cim':
             ## enrichment (impl, deployments)

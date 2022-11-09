@@ -21,7 +21,7 @@ python setup.py develop
 ## Usage
 
 ```
-nano-cli --cim stuff/backup/workpress.yml 
+nano-cli --cim stuff/backup/wordpress.yml 
 ```
 
 redirect to wordpress.puml and create image
