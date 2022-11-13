@@ -1,4 +1,9 @@
 from .pattern import Pattern
 
 class CMS(Pattern):
-    pass
+    
+    def get_name(self):
+        return "cms"
+
+    def needs_database(self):
+        return True

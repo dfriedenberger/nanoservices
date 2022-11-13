@@ -3,7 +3,7 @@ from nanoservices import __version__
 from nanoservices.yaml2rdf import create_rdf_graph_from_yaml
 from nanoservices.enrichment import enrichment
 from nanoservices.rdf2puml import rdf2pumlServices
-
+from nanoservices.implementation import implementation
 
 import argparse
 
@@ -29,5 +29,10 @@ if args.cim:
         print(txt)
         # from pim to psm
         ## create tasks
+        project = implementation(graph)
+        for task in project.tasks:
+            print("Task",task.name,task.pattern)
+            for asset in task.assets:
+                print("","Implement",asset)
         ## create implementation
         

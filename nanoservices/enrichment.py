@@ -27,8 +27,7 @@ def enrichment(graph : Graph) -> None:
     query_wrapper = SparQLWrapper(graph)
     create_wrapper = GraphWrapper(graph)
 
-    repositories = []
-    cmss = []
+    db_clients = []
 
     jobs = []
 
@@ -37,13 +36,18 @@ def enrichment(graph : Graph) -> None:
 
     
     for service in query_wrapper.get_instances_of_type(MBA.Service):
-        for pattern in query_wrapper.get_object_properties(service,MBA.pattern):
-            if pattern == "repository":
-                repositories.append(service)
-            if pattern == "cms":
-                cmss.append(service)
+        for p in query_wrapper.get_object_properties(service,MBA.pattern):
+
+            #Todo move to pattern
             if pattern == "job":
                 jobs.append(service) 
+
+            if p not in pattern:
+                print(f"ignore pattern {p}")
+                continue
+
+            if pattern[p].needs_database():
+                db_clients.append(service)
         
         for triggered_service in query_wrapper.get_out_references(service,MBA.trigger):
             triggers_send.append(service)
@@ -55,7 +59,9 @@ def enrichment(graph : Graph) -> None:
         # add job-repository
         rdf_job_repository = create_wrapper.add_named_instance(MBA.Service,"job-repository")
         create_wrapper.add_str_property(MBA.pattern,rdf_job_repository,"repository")
-        repositories.append(rdf_job_repository)
+        
+        #repositories.append(rdf_job_repository)
+        db_clients.append(rdf_job_repository)
 
         #Add Queue
         rdf_msg = create_wrapper.add_named_instance(MBA.Message,"job")
@@ -94,20 +100,21 @@ def enrichment(graph : Graph) -> None:
             create_wrapper.add_str_property(MBA.group,job,'system.job')
 
 
-    # strategy handle repository patterns
-    if len(repositories) > 0 or len(cmss) > 0:
+    # TODO als plugin strategy auslagern
+    # strategy create database if needed
+    if len(db_clients):
+
         # add database
         rdf_db = create_wrapper.add_named_instance(MBA.Service,"db")
         create_wrapper.add_str_property(MBA.pattern,rdf_db,"database")
 
-        for rdf_repository in repositories:
-            create_wrapper.add_reference(MBA.use,rdf_repository,rdf_db)
+        for rdf_obj in db_clients:
+            create_wrapper.add_reference(MBA.use,rdf_obj,rdf_db)
         
-        for rdf_cms in cmss:
-            create_wrapper.add_reference(MBA.use,rdf_cms,rdf_db)
-
         #grouping
         create_wrapper.add_str_property(MBA.group,rdf_db,'system.infrastructure')
+
+
 
     # strategy handle pub-sub communication
     ## yes for tracing, Global parameter

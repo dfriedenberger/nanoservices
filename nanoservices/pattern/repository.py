@@ -1,4 +1,9 @@
 from .pattern import Pattern
 
 class Repository(Pattern):
-    pass
+    
+    def get_name(self):
+        return "repository"
+
+    def needs_database(self):
+        return True
