@@ -12,6 +12,16 @@ from rdflib.namespace import  XSD
 # Add Config
 # Aspekte wie logging, tracing events, ... hinzufügen
 
+
+from .pattern.cms import CMS
+from .pattern.repository import Repository
+
+pattern =  { 
+    "cms" : CMS() ,
+    "repository" : Repository()
+}
+
+
 def enrichment(graph : Graph) -> None:
 
     query_wrapper = SparQLWrapper(graph)

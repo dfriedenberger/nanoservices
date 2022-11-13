@@ -1,0 +1,5 @@
+services:
+
+  # Content Managemennt System
+  cms:
+    pattern: cms

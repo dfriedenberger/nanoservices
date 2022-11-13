@@ -1,30 +1,6 @@
 from nanoservices.yaml2rdf import create_rdf_graph_from_yaml
 from rdflib import Graph
-
-
-def short(o):
-    return str(o).split("#")[-1]
-
-def get_instances(graph):
-        q = """
-            SELECT ?s
-            WHERE {
-                ?s a ?t .
-            }
-            """
-        return [short(r['s']) for r in graph.query(q)]
-       
-
-def get_references(graph):
-        q = """
-            SELECT ?s ?p ?o
-            WHERE {
-                ?s ?p ?o .
-                ?s a ?t1 .
-                ?o a ?t2 .
-            }
-            """
-        return [(short(r['s']),short(r['p']),short(r['o'])) for r in graph.query(q)]
+from helper import get_instances, get_references
 
 def test_create_simple_model_from_yaml():
     yaml = """
